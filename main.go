@@ -1,7 +1,22 @@
 package main
 
-import "fmt"
+import (
+	"flag"
+	"kvm-agent/internal/config"
+	"kvm-agent/internal/log"
+	"kvm-agent/internal/utils"
+)
 
 func main() {
-	fmt.Printf("Hello, world!\n")
+	configPath := flag.String("c", "./config.yaml", "config file path")
+	flag.Parse()
+
+	// init
+	config.ConfigInit(*configPath)
+	utils.KVMAgentBanner()
+	log.InitLogger(config.Config.App)
+
+	defer func() {
+		log.GetLogger().Sync()
+	}()
 }

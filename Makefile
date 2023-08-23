@@ -3,6 +3,7 @@ DIRS=$(shell ls)
 GO=go
 NFPM=nfpm
 NAME=kvm-agent
+REPO_TRACK=repotrack # dnf download https://dnf-plugins-core.readthedocs.io/en/latest/download.html
 
 # root
 COMMON_SELF_DIR := $(dir $(lastword $(MAKEFILE_LIST)))
@@ -30,7 +31,7 @@ endif
 BUILDFILE = "./main.go"
 
 .PHONY: all
-all: clean build build-rpm build-deb
+all: clean download-deps build build-rpm build-deb
 
 .PHONY: build
 build:
@@ -59,3 +60,30 @@ build-deb:
 	@echo "build-pkg===========> Building deb package"
 	@$(NFPM) pkg -f $(BUILD_DIR)/nfpm.yaml --packager deb --target $(BUILD_DIR)/tmp/
 	@echo "build-pkg===========> Building deb package success in $(BUILD_DIR)/tmp/"
+
+.PHONY: download-deps
+download-deps:
+	@echo "download-deps===========> Downloading [perf] dependencies"
+	@sudo $(REPO_TRACK) --downloaddir $(BUILD_DIR)/deps/ perf
+	@echo "download-deps===========> Downloading [perf] dependencies success"
+	@echo "download-deps===========> Downloading [pcp-system-tools] dependencies"
+	@sudo $(REPO_TRACK) --downloaddir $(BUILD_DIR)/deps/ pcp-system-tools
+	@echo "download-deps===========> Downloading [pcp-system-tools] dependencies success"
+
+.PHONY: clear-deps
+clear-deps:
+	@echo "clear-deps===========> Clearing [perf] dependencies"
+	@sudo rm -rf $(BUILD_DIR)/deps/*.rpm
+	@echo "clear-deps===========> Clearing [perf] dependencies success"
+	@echo "clear-deps===========> Clearing [pcp-system-tools] dependencies"
+	@sudo rm -rf $(BUILD_DIR)/deps/*.rpm
+	@echo "clear-deps===========> Clearing [pcp-system-tools] dependencies success"
+
+.PHONY: install-deps
+install-deps:
+	@echo "install-deps===========> Installing [perf] dependencies"
+	@sudo dnf install -y $(BUILD_DIR)/deps/*.rpm
+	@echo "install-deps===========> Installing [perf] dependencies success"
+	@echo "install-deps===========> Installing [pcp-system-tools] dependencies"
+	@sudo dnf install -y $(BUILD_DIR)/deps/*.rpm
+	@echo "install-deps===========> Installing [pcp-system-tools] dependencies success"
