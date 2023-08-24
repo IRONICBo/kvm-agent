@@ -16,7 +16,7 @@ app:
 
 agent:
   uuid: 6e8c2828-5460-49a2-99a9-6ed809ae4d1d # agent uuid
-  period: 3 # collect data every 3 seconds
+  period: 5 # collect data every 5 seconds
   gzip: true # compress report data
 
 redis:

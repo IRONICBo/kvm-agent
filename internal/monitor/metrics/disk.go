@@ -7,8 +7,8 @@ type DiskInfo struct {
 
 // DiskStat disk stat.
 type DiskStat struct {
-	PartitionWithUsageStats []PartitionWithUsageStat `json:"partition_with_usage_stats"`
-	DiskIOCountersStats     []DiskIOCountersStat     `json:"disk_io_counters_stats"`
+	PartitionWithUsageAndIOStat []PartitionWithUsageAndIOStat `json:"partition_with_usage_stats"`
+	// DiskIOCountersStats     []DiskIOCountersStat     `json:"disk_io_counters_stats"`
 }
 
 // DiskIOCountersStat io counters stat.
@@ -29,8 +29,8 @@ type DiskIOCountersStat struct {
 	Label            string `json:"label"`
 }
 
-// PartitionWithUsageStat partition stat with usage stat.
-type PartitionWithUsageStat struct {
+// PartitionWithUsageAndIOStat partition stat with usage and io stat.
+type PartitionWithUsageAndIOStat struct {
 	// partition stat
 	Device     string `json:"device"`
 	Mountpoint string `json:"mountpoint"`
@@ -47,6 +47,22 @@ type PartitionWithUsageStat struct {
 	InodesUsed        uint64  `json:"inodesUsed"`
 	InodesFree        uint64  `json:"inodesFree"`
 	InodesUsedPercent float64 `json:"inodesUsedPercent"`
+
+	// io counters stat
+	ReadCount        uint64 `json:"read_count"`
+	MergedReadCount  uint64 `json:"merged_read_count"`
+	WriteCount       uint64 `json:"write_count"`
+	MergedWriteCount uint64 `json:"merged_write_count"`
+	ReadBytes        uint64 `json:"read_bytes"`
+	WriteBytes       uint64 `json:"write_bytes"`
+	ReadTime         uint64 `json:"read_time"`
+	WriteTime        uint64 `json:"write_time"`
+	IopsInProgress   uint64 `json:"iops_in_progress"`
+	IoTime           uint64 `json:"io_time"`
+	WeightedIO       uint64 `json:"weighted_io"`
+	Name             string `json:"name"`
+	SerialNumber     string `json:"serial_number"`
+	Label            string `json:"label"`
 }
 
 // PartitionStat partition stat.

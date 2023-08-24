@@ -1,6 +1,6 @@
 package metrics
 
-type Metrics struct {
+type MetricStat struct {
 	UUID      string `json:"uuid"`
 	Timestamp int64  `json:"timestamp"`
 
