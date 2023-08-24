@@ -7,6 +7,7 @@ import (
 	"kvm-agent/internal/dal/cache"
 	"kvm-agent/internal/dal/gen"
 	"sync"
+	"time"
 )
 
 // MonitorDao monitor dao.
@@ -46,6 +47,8 @@ func (d *MonitorDao) PushListWithRetry(key, data string, retry int) error {
 	// check list length, if length > 100, wait forever.
 	if length, _ := (*d.cache).LLen(d.ctx, key); length > 100 {
 		d.mu.Unlock()
+		time.Sleep(time.Duration(retry) * time.Second)
+
 		d.PushListWithRetry(key, data, retry)
 		return errors.New("list length is more than 100")
 	}

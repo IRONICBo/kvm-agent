@@ -12,11 +12,11 @@
 app:
   version: 1.0.0
   debug: true # debug mode
-  log_file: ./logs # log mode
+  log_file: /var/log/kvm-agent # log mode
 
 agent:
   uuid: 6e8c2828-5460-49a2-99a9-6ed809ae4d1d # agent uuid
-  period: 5 # collect data every 5 seconds
+  period: 10 # collect data every 5 seconds
   gzip: true # compress report data
 
 redis:
