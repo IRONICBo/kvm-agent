@@ -23,10 +23,11 @@ APP Mode:
 - Log file: %s
 
 Agent Mode:
+- UUID: %s
 - Period: %d
 - GZip: %v
 `
-	content := fmt.Sprintf(logo, config.Config.App.Version, config.Config.App.Debug, config.Config.App.LogFile, config.Config.Agent.Period, config.Config.Agent.GZip)
+	content := fmt.Sprintf(logo, config.Config.App.Version, config.Config.App.Debug, config.Config.App.LogFile, config.Config.Agent.UUID, config.Config.Agent.Period, config.Config.Agent.GZip)
 
 	Box := box.New(box.Config{
 		Px:       5,

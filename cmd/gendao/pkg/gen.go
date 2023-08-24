@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"go/format"
 	"io/fs"
-	"io/ioutil"
+	"os"
 	"reflect"
 	"strings"
 	"unicode"
@@ -123,7 +123,7 @@ func (g *DaoGenerator) Format() *DaoGenerator {
 // Flush write the generated code to file.
 func (g *DaoGenerator) Flush() {
 	filename := fmt.Sprintf("gen_%s_dao.go", camelToUnderscore(g.config.ModelName))
-	if err := ioutil.WriteFile(
+	if err := os.WriteFile(
 		fmt.Sprintf("%s/%s", g.savePath, filename),
 		g.buf.Bytes(),
 		fs.ModePerm); err != nil {

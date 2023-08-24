@@ -124,6 +124,22 @@ func (d *GuestInfoDao) FindByUUIDPage(uuid string, offset int, limit int) ([]*mo
 	return result, count, err
 }
 
+// FindFirstByHostDesc get first matched result by hostdesc.
+func (d *GuestInfoDao) FindFirstByHostDesc(hostdesc string) (*models.GuestInfo, error) {
+	m := d.query.GuestInfo
+
+	return m.WithContext(d.ctx).Where(m.HostDesc.Eq(hostdesc)).First()
+}
+
+// FindByHostDescPage get page by HostDesc.
+func (d *GuestInfoDao) FindByHostDescPage(hostdesc string, offset int, limit int) ([]*models.GuestInfo, int64, error) {
+	m := d.query.GuestInfo
+
+	result, count, err := m.WithContext(d.ctx).Where(m.HostDesc.Eq(hostdesc)).FindByPage(offset, limit)
+
+	return result, count, err
+}
+
 // FindFirstByCpuDesc get first matched result by cpudesc.
 func (d *GuestInfoDao) FindFirstByCpuDesc(cpudesc string) (*models.GuestInfo, error) {
 	m := d.query.GuestInfo
@@ -190,7 +206,8 @@ func (d *GuestInfoDao) FindByNetDescPage(netdesc string, offset int, limit int) 
 
 // Update update model.
 func (d *GuestInfoDao) Update(m *models.GuestInfo) error {
-	res, err := d.query.WithContext(d.ctx).GuestInfo.Updates(m)
+	q := d.query.GuestInfo
+	res, err := d.query.WithContext(d.ctx).GuestInfo.Where(q.UUID.Eq(m.UUID)).Updates(m)
 	if err != nil && res.Error != nil {
 		return err
 	}

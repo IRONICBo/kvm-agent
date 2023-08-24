@@ -12,11 +12,11 @@ import (
 var r *redis.Client
 
 // InitRedisDB init redis client.
-func InitRedisDB() {
+func InitRedisDB(config config.Redis) {
 	r = redis.NewClient(&redis.Options{
-		Addr:     fmt.Sprintf("%s:%d", config.Config.Redis.Ip, config.Config.Redis.Port),
-		Password: config.Config.Redis.Password, // no password set
-		DB:       config.Config.Redis.Database, // use default DB
+		Addr:     fmt.Sprintf("%s:%d", config.Ip, config.Port),
+		Password: config.Password, // no password set
+		DB:       config.Database, // use default DB
 	})
 	pong, err := r.Ping(context.Background()).Result()
 	if err != nil {

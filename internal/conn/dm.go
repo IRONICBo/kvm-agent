@@ -21,7 +21,7 @@ func (w writer) Printf(format string, args ...interface{}) {
 }
 
 // InitDMDB init mysql connection.
-func InitDMDB(config config.DM) {
+func InitDMDB(config config.DM, debug bool) {
 	// try to use default database [mysql]
 	dsn := fmt.Sprintf("dm://%s:%s@%s:%d?compatibleMode=mysql",
 		config.Username,
@@ -31,12 +31,21 @@ func InitDMDB(config config.DM) {
 		// "SYSDBA", // sys database
 	)
 
-	logger := logger.New(
-		writer{},
-		logger.Config{
+	cfg := logger.Config{
+		IgnoreRecordNotFoundError: true, // Ignore ErrRecordNotFound error for logger
+		Colorful:                  true, // Disable color
+	}
+	if debug {
+		cfg = logger.Config{
+			LogLevel:                  logger.Info,
 			IgnoreRecordNotFoundError: true, // Ignore ErrRecordNotFound error for logger
 			Colorful:                  true, // Disable color
-		},
+		}
+	}
+
+	logger := logger.New(
+		writer{},
+		cfg,
 	)
 
 	// connect to dm

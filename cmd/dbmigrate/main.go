@@ -18,7 +18,7 @@ func main() {
 	config.ConfigInit(*configPath)
 	utils.KVMAgentBanner()
 	log.InitLogger(config.Config.App)
-	conn.InitDMDB(config.Config.DM)
+	conn.InitDMDB(config.Config.DM, config.Config.App.Debug)
 
 	// get db instance.
 	db := conn.GetDMDB()

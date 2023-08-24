@@ -3,7 +3,9 @@ package main
 import (
 	"flag"
 	"kvm-agent/internal/config"
+	"kvm-agent/internal/conn"
 	"kvm-agent/internal/log"
+	"kvm-agent/internal/tasks"
 	"kvm-agent/internal/utils"
 )
 
@@ -15,8 +17,16 @@ func main() {
 	config.ConfigInit(*configPath)
 	utils.KVMAgentBanner()
 	log.InitLogger(config.Config.App)
+	conn.InitDMDB(config.Config.DM, config.Config.App.Debug)
+	conn.InitRedisDB(config.Config.Redis)
 
 	defer func() {
 		log.GetLogger().Sync()
 	}()
+
+	tasks.InitGuestInfo(config.Config.Agent)
+	tasks.RegisterGuestAgentOffline(config.Config.Agent)
+
+	for {
+	}
 }

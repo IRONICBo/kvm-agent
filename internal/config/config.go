@@ -16,6 +16,7 @@ func ConfigInit(configPath string) {
 			LogFile: GetString("app.log_file"),
 		},
 		Agent: Agent{
+			UUID:   GetString("agent.uuid"),
 			Period: GetInt("agent.period"),
 			GZip:   GetBool("agent.gzip"),
 		},
@@ -50,8 +51,9 @@ type App struct {
 
 // Agent config.
 type Agent struct {
-	Period int  `mapstructure:"period"`
-	GZip   bool `mapstructure:"gzip"`
+	UUID   string `mapstructure:"uuid"`
+	Period int    `mapstructure:"period"`
+	GZip   bool   `mapstructure:"gzip"`
 }
 
 // Redis config.

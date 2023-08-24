@@ -6,6 +6,7 @@ package gen
 
 import (
 	"context"
+	"fmt"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -32,6 +33,7 @@ func newGuestInfo(db *gorm.DB, opts ...gen.DOOption) guestInfo {
 	_guestInfo.UpdatedAt = field.NewTime(tableName, "updated_at")
 	_guestInfo.DeletedAt = field.NewTime(tableName, "deleted_at")
 	_guestInfo.UUID = field.NewString(tableName, "uuid")
+	_guestInfo.HostDesc = field.NewString(tableName, "host_desc")
 	_guestInfo.CpuDesc = field.NewString(tableName, "cpu_desc")
 	_guestInfo.MemDesc = field.NewString(tableName, "mem_desc")
 	_guestInfo.DiskDesc = field.NewString(tableName, "disk_desc")
@@ -53,6 +55,7 @@ type guestInfo struct {
 	UpdatedAt field.Time
 	DeletedAt field.Time
 	UUID      field.String
+	HostDesc  field.String
 	CpuDesc   field.String
 	MemDesc   field.String
 	DiskDesc  field.String
@@ -80,6 +83,7 @@ func (g *guestInfo) updateTableName(table string) *guestInfo {
 	g.UpdatedAt = field.NewTime(table, "updated_at")
 	g.DeletedAt = field.NewTime(table, "deleted_at")
 	g.UUID = field.NewString(table, "uuid")
+	g.HostDesc = field.NewString(table, "host_desc")
 	g.CpuDesc = field.NewString(table, "cpu_desc")
 	g.MemDesc = field.NewString(table, "mem_desc")
 	g.DiskDesc = field.NewString(table, "disk_desc")
@@ -112,12 +116,13 @@ func (g *guestInfo) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (g *guestInfo) fillFieldMap() {
-	g.fieldMap = make(map[string]field.Expr, 11)
+	g.fieldMap = make(map[string]field.Expr, 12)
 	g.fieldMap["id"] = g.Id
 	g.fieldMap["created_at"] = g.CreatedAt
 	g.fieldMap["updated_at"] = g.UpdatedAt
 	g.fieldMap["deleted_at"] = g.DeletedAt
 	g.fieldMap["uuid"] = g.UUID
+	g.fieldMap["host_desc"] = g.HostDesc
 	g.fieldMap["cpu_desc"] = g.CpuDesc
 	g.fieldMap["mem_desc"] = g.MemDesc
 	g.fieldMap["disk_desc"] = g.DiskDesc
@@ -292,6 +297,7 @@ func (g guestInfoDo) Unscoped() IGuestInfoDo {
 }
 
 func (g guestInfoDo) Create(values ...*models.GuestInfo) error {
+	fmt.Printf("create :%#v \n", values)
 	if len(values) == 0 {
 		return nil
 	}

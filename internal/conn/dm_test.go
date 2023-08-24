@@ -19,5 +19,5 @@ func TestDMConn(t *testing.T) {
 		Password: "SYSDBA",
 	}
 
-	InitDMDB(config)
+	InitDMDB(config, true)
 }

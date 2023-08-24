@@ -70,7 +70,10 @@ func (d *{{$modelName}}Dao) FindBy{{.FieldName}}Page({{.NormFieldName}} {{.Field
 {{end}}
 // Update update model.
 func (d *{{.ModelName}}Dao) Update(m *{{.NormPkgName}}.{{.ModelName}}) error {
-	res, err := d.query.WithContext(d.ctx).{{.ModelName}}.Updates(m)
+	q := d.query.{{.ModelName}}
+	res, err := d.query.WithContext(d.ctx).{{.ModelName}}.Where(q.ID.Eq(m.ID)).Updates(m)
+	// May be failed in DM database
+	// res, err := d.query.WithContext(d.ctx).{{.ModelName}}.Updates(m)
 	if err != nil && res.Error != nil {
 		return err
 	}
