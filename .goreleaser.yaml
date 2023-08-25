@@ -22,13 +22,13 @@ nfpms:
     contents:
       # - src: ./build/output/kvm-agent
       #   dst: /usr/bin/kvm-agent
-      - src: ./build/output/config.yaml
+      - src: config.yaml
         dst: /etc/kvm-agent/config.yaml
         type: config
       - src: /usr/bin/kvm-agent
         dst: /sbin/kvm-agent
         type: symlink
-      - src: ./build/systemd/kvm-agent.service
+      - src: build/systemd/kvm-agent.service
         dst: /lib/systemd/system/kvm-agent.service
     overrides:
       rpm:
