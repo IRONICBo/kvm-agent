@@ -5,3 +5,4 @@ logs/*
 logs
 
 build/deps/*
+dist/
