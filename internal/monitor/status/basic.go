@@ -234,8 +234,8 @@ func GetNetStat() *metrics.NetStat {
 	metric.ConnectionStats = make([]metrics.ConnectionStat, 0)
 	metric.ConntrackStats = make([]metrics.ConntrackStat, 0)
 	metric.FilterStats = make([]metrics.FilterStat, 0)
-	metric.NetIOCountersStats = make([]metrics.NetIOCountersStat, 0)
-	metric.ProtoCountersStats = make([]metrics.ProtoCountersStat, 0)
+	metric.NetIOCountersStats = make(map[string]interface{}, 0)
+	metric.ProtoCountersStats = make(map[string]interface{}, 0)
 
 	for _, connection := range connections {
 		tempConnectionStat := metrics.ConnectionStat{
@@ -290,7 +290,6 @@ func GetNetStat() *metrics.NetStat {
 
 	for _, n := range netioc {
 		tempNetIOCountersStat := metrics.NetIOCountersStat{
-			Name:        n.Name,
 			BytesSent:   n.BytesSent,
 			BytesRecv:   n.BytesRecv,
 			PacketsSent: n.PacketsSent,
@@ -300,7 +299,7 @@ func GetNetStat() *metrics.NetStat {
 			Dropin:      n.Dropin,
 			Dropout:     n.Dropout,
 		}
-		metric.NetIOCountersStats = append(metric.NetIOCountersStats, tempNetIOCountersStat)
+		metric.NetIOCountersStats[n.Name] = tempNetIOCountersStat // key is interface name
 	}
 
 	for _, p := range pc {
@@ -308,7 +307,7 @@ func GetNetStat() *metrics.NetStat {
 			Protocol: p.Protocol,
 			Stats:    p.Stats,
 		}
-		metric.ProtoCountersStats = append(metric.ProtoCountersStats, tempProtoCountersStat)
+		metric.ProtoCountersStats[tempProtoCountersStat.Protocol] = tempProtoCountersStat.Stats // key is protocol name
 	}
 
 	return metric

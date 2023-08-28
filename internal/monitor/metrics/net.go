@@ -21,11 +21,11 @@ type InterfaceInfo struct {
 
 // NetStat net stat.
 type NetStat struct {
-	ConnectionStats    []ConnectionStat    `json:"connection_stats"`
-	ConntrackStats     []ConntrackStat     `json:"conntrack_stats"`
-	FilterStats        []FilterStat        `json:"filter_stats"`
-	NetIOCountersStats []NetIOCountersStat `json:"net_io_counters_stats"`
-	ProtoCountersStats []ProtoCountersStat `json:"proto_counters_stats"`
+	ConnectionStats    []ConnectionStat       `json:"connection_stats"`
+	ConntrackStats     []ConntrackStat        `json:"conntrack_stats"`
+	FilterStats        []FilterStat           `json:"filter_stats"`
+	NetIOCountersStats map[string]interface{} `json:"net_io_counters_stats"` // key is interface name
+	ProtoCountersStats map[string]interface{} `json:"proto_counters_stats"`  // key is protocol name
 }
 
 // Addr net address
@@ -75,7 +75,7 @@ type FilterStat struct {
 
 // NetIOCountersStat net io counters stat.
 type NetIOCountersStat struct {
-	Name        string `json:"name"`         // interface name
+	// Name        string `json:"name"`         // interface name
 	BytesSent   uint64 `json:"bytes_sent"`   // number of bytes sent
 	BytesRecv   uint64 `json:"bytes_recv"`   // number of bytes received
 	PacketsSent uint64 `json:"packets_sent"` // number of packets sent
