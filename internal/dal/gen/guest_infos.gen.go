@@ -6,7 +6,6 @@ package gen
 
 import (
 	"context"
-	"fmt"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -38,6 +37,7 @@ func newGuestInfo(db *gorm.DB, opts ...gen.DOOption) guestInfo {
 	_guestInfo.MemDesc = field.NewString(tableName, "mem_desc")
 	_guestInfo.DiskDesc = field.NewString(tableName, "disk_desc")
 	_guestInfo.NetDesc = field.NewString(tableName, "net_desc")
+	_guestInfo.Period = field.NewInt(tableName, "period")
 	_guestInfo.UseGzip = field.NewBool(tableName, "use_gzip")
 	_guestInfo.IsOnline = field.NewBool(tableName, "is_online")
 
@@ -60,6 +60,7 @@ type guestInfo struct {
 	MemDesc   field.String
 	DiskDesc  field.String
 	NetDesc   field.String
+	Period    field.Int
 	UseGzip   field.Bool
 	IsOnline  field.Bool
 
@@ -88,6 +89,7 @@ func (g *guestInfo) updateTableName(table string) *guestInfo {
 	g.MemDesc = field.NewString(table, "mem_desc")
 	g.DiskDesc = field.NewString(table, "disk_desc")
 	g.NetDesc = field.NewString(table, "net_desc")
+	g.Period = field.NewInt(table, "period")
 	g.UseGzip = field.NewBool(table, "use_gzip")
 	g.IsOnline = field.NewBool(table, "is_online")
 
@@ -116,7 +118,7 @@ func (g *guestInfo) GetFieldByName(fieldName string) (field.OrderExpr, bool) {
 }
 
 func (g *guestInfo) fillFieldMap() {
-	g.fieldMap = make(map[string]field.Expr, 12)
+	g.fieldMap = make(map[string]field.Expr, 13)
 	g.fieldMap["id"] = g.Id
 	g.fieldMap["created_at"] = g.CreatedAt
 	g.fieldMap["updated_at"] = g.UpdatedAt
@@ -127,6 +129,7 @@ func (g *guestInfo) fillFieldMap() {
 	g.fieldMap["mem_desc"] = g.MemDesc
 	g.fieldMap["disk_desc"] = g.DiskDesc
 	g.fieldMap["net_desc"] = g.NetDesc
+	g.fieldMap["period"] = g.Period
 	g.fieldMap["use_gzip"] = g.UseGzip
 	g.fieldMap["is_online"] = g.IsOnline
 }
@@ -297,7 +300,6 @@ func (g guestInfoDo) Unscoped() IGuestInfoDo {
 }
 
 func (g guestInfoDo) Create(values ...*models.GuestInfo) error {
-	fmt.Printf("create :%#v \n", values)
 	if len(values) == 0 {
 		return nil
 	}

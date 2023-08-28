@@ -204,10 +204,28 @@ func (d *GuestInfoDao) FindByNetDescPage(netdesc string, offset int, limit int) 
 	return result, count, err
 }
 
+// FindFirstByPeriod get first matched result by period.
+func (d *GuestInfoDao) FindFirstByPeriod(period int) (*models.GuestInfo, error) {
+	m := d.query.GuestInfo
+
+	return m.WithContext(d.ctx).Where(m.Period.Eq(period)).First()
+}
+
+// FindByPeriodPage get page by Period.
+func (d *GuestInfoDao) FindByPeriodPage(period int, offset int, limit int) ([]*models.GuestInfo, int64, error) {
+	m := d.query.GuestInfo
+
+	result, count, err := m.WithContext(d.ctx).Where(m.Period.Eq(period)).FindByPage(offset, limit)
+
+	return result, count, err
+}
+
 // Update update model.
 func (d *GuestInfoDao) Update(m *models.GuestInfo) error {
 	q := d.query.GuestInfo
 	res, err := d.query.WithContext(d.ctx).GuestInfo.Where(q.UUID.Eq(m.UUID)).Updates(m)
+	// May be failed in DM database
+	// res, err := d.query.WithContext(d.ctx).GuestInfo.Updates(m)
 	if err != nil && res.Error != nil {
 		return err
 	}

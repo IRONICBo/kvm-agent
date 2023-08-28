@@ -37,6 +37,7 @@ func (svc *GuestService) CreateGuestInfo(uuid string) (string, int, error) {
 		MemDesc:  info.GetMemInfoJsonCompressed(),
 		DiskDesc: info.GetDiskInfoJsonCompressed(),
 		NetDesc:  info.GetNetInfoJsonCompressed(),
+		Period:   config.Config.Agent.Period, // Period can not be 0
 		UseGzip:  &config.Config.Agent.GZip,
 		IsOnline: &online,
 	}
