@@ -26,12 +26,12 @@ func NewMonitorService(c context.Context) *MonitorService {
 }
 
 // GuestMonitorPush update guest monitor info.
-func (s *MonitorService) GuestMonitorPush(uuid, data string, retry int) error {
+func (s *MonitorService) GuestMonitorPush(uuid, data string, interval int) error {
 	log.Infof("GuestMonitorPush", "%s data: %s", uuid, data)
 
 	// Push to redis.
 	// check list length, if length > 100, wait forever.
-	err := s.MonitorDao.PushListWithRetry(fmt.Sprintf("%s%s", MONITOR_PERFIX, uuid), data, retry)
+	err := s.MonitorDao.PushListWithRetry(fmt.Sprintf("%s%s", MONITOR_PERFIX, uuid), data, 10, interval)
 	if err != nil {
 		return err
 	}

@@ -34,29 +34,38 @@ func NewMonitorDao() *MonitorDao {
 }
 
 // PushListWithRetry push list with retry.
-func (d *MonitorDao) PushListWithRetry(key, data string, retry int) error {
+func (d *MonitorDao) PushListWithRetry(key, data string, retry, interval int) error {
 	// Push to redis.
 	// check list length, if length > 100, wait forever.
 	d.mu.Lock()
 	defer d.mu.Unlock()
 
-	if retry == 0 {
+	// TODO: Set max retry times.
+	if retry > 20 {
+		retry = 20
+	}
+	if retry < 0 {
+		retry = 0
 		return errors.New("retry times is 0")
+	}
+
+	if interval == 0 {
+		return errors.New("interval times is 0")
 	}
 
 	// check list length, if length > 100, wait forever.
 	if length, _ := (*d.cache).LLen(d.ctx, key); length > 100 {
 		d.mu.Unlock()
-		time.Sleep(time.Duration(retry) * time.Second)
+		time.Sleep(time.Duration(interval) * time.Second)
 
-		d.PushListWithRetry(key, data, retry)
+		d.PushListWithRetry(key, data, retry-1, interval)
 		return errors.New("list length is more than 100")
 	}
 
 	err := (*d.cache).LPush(d.ctx, key, data)
 	if err != nil {
 		d.mu.Unlock()
-		d.PushListWithRetry(key, data, retry-1)
+		d.PushListWithRetry(key, data, retry-1, interval)
 		return errors.New("push list error")
 	}
 
