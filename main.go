@@ -27,6 +27,7 @@ func main() {
 	tasks.InitGuestInfo(config.Config.Agent)
 	tasks.RegisterGuestAgentOffline(config.Config.Agent)
 	go tasks.StartGuestMonitorTask(config.Config.Agent, config.Config.Agent.GZip)
+	go tasks.StartGuestTriggerTask(config.Config.Agent, config.Config.Agent.GZip)
 
 	for {
 	}

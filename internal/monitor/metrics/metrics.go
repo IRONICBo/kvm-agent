@@ -9,4 +9,5 @@ type MetricStat struct {
 	DiskStat    *DiskStat    `json:"disk_stat"`
 	NetStat     *NetStat     `json:"net_stat"`
 	ProcessStat *ProcessStat `json:"process_stat"`
+	AlertStat   *AlertStat   `json:"alert_stat"`
 }

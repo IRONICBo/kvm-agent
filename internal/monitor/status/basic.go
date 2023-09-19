@@ -441,6 +441,50 @@ func GetAllStat(uuid string, timeout int) metrics.MetricStat {
 	select {
 	case <-time.After(timeoutEvent):
 		log.Errorf("GetAllStat", "timeout :%s", timeoutEvent.String())
+
+		// Calc alert data
+		metric.AlertStat = calcAlertData(&metric)
+
 		return metric
 	}
+}
+
+// CalcAlertData calculate alert data.
+// This function is used to calculate the average value of the data.
+func calcAlertData(metric *metrics.MetricStat) *metrics.AlertStat {
+	alertStat := &metrics.AlertStat{}
+
+	// CPU
+	cpuPercentSum := 0.0
+	for _, cpuPercent := range metric.CpuStat.CPUPercents {
+		cpuPercentSum += cpuPercent
+	}
+	alertStat.AverageCpuPercent = cpuPercentSum / float64(len(metric.CpuStat.CPUPercents))
+
+	// MEM
+	alertStat.AverageMemPercent = metric.MemStat.VirtualMemoryStat.UsedPercent
+
+	// DISK
+	// diskPercentSum := 0.0
+	// for _, partitionWithUsageAndIOStat := range metric.DiskStat.PartitionWithUsageAndIOStat {
+	// 	diskPercentSum += partitionWithUsageAndIOStat.UsedPercent
+	// }
+	// alertStat.AverageDiskPercent = diskPercentSum / float64(len(metric.DiskStat.PartitionWithUsageAndIOStat))
+
+	// Now only use the "/" path
+	for _, partitionWithUsageAndIOStat := range metric.DiskStat.PartitionWithUsageAndIOStat {
+		if partitionWithUsageAndIOStat.Path == "/" {
+			alertStat.AverageDiskPercent = partitionWithUsageAndIOStat.UsedPercent
+		}
+	}
+
+	// NET
+	alertStat.ConnectNetCount = len(metric.NetStat.ConnectionStats)
+
+	// LOAD
+	alertStat.Load1 = metric.CpuStat.CPULoad.Load1
+	alertStat.Load5 = metric.CpuStat.CPULoad.Load5
+	alertStat.Load15 = metric.CpuStat.CPULoad.Load15
+
+	return alertStat
 }
