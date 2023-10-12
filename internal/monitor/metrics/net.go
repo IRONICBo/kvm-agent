@@ -1,7 +1,21 @@
 package metrics
 
+// IP route.
+type IPRoute struct {
+	Destination string `json:"destination"`
+	Gateway     string `json:"gateway"`
+	Genmask     string `json:"genmask"`
+	Flags       string `json:"flags"`
+	MSS         string `json:"mss"`
+	Window      string `json:"window"`
+	IRTT        string `json:"irtt"`
+	Interface   string `json:"interface"`
+}
+
+// NetInfo net info.
 type NetInfo struct {
 	InterfaceInfos []InterfaceInfo `json:"interface_infos"`
+	IPRouteInfos   []IPRoute       `json:"ip_route_infos"`
 }
 
 // NetInterfaceAddr net interface addr.

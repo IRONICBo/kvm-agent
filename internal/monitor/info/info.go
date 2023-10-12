@@ -2,8 +2,13 @@ package info
 
 import (
 	"encoding/json"
+	"fmt"
+	"kvm-agent/internal/log"
 	"kvm-agent/internal/monitor/metrics"
 	"kvm-agent/internal/utils"
+	"os/exec"
+	"regexp"
+	"strings"
 
 	"github.com/shirou/gopsutil/cpu"
 	"github.com/shirou/gopsutil/disk"
@@ -159,8 +164,16 @@ func GetNetInfo() (metrics.NetInfo, error) {
 		})
 	}
 
+	// Get Ip route info
+	ipRouteInfo, err := GetIPRouteInfo()
+	if err != nil {
+		log.Errorf("GetNetInfo", "GetIPRouteInfo error: %v", err)
+		ipRouteInfo = make([]metrics.IPRoute, 0)
+	}
+
 	return metrics.NetInfo{
 		InterfaceInfos: interfaceInfos,
+		IPRouteInfos:   ipRouteInfo,
 	}, nil
 }
 
@@ -180,11 +193,62 @@ func GetNetInfoJsonCompressed() string {
 	return utils.Base64Encode(marshal)
 }
 
+// GetIPRouteInfo returns ip route info
+func GetIPRouteInfo() ([]metrics.IPRoute, error) {
+	cmd := exec.Command("netstat", "-r")
+	output, err := cmd.Output()
+	if err != nil {
+		fmt.Println("Error:", err)
+
+		return []metrics.IPRoute{}, err
+	}
+
+	lines := strings.Split(string(output), "\n")
+	if len(lines) < 3 {
+		return []metrics.IPRoute{}, fmt.Errorf("invalid output")
+	}
+
+	// skip 2 lines
+	//Kernel IP routing table
+	// Destination     Gateway         Genmask         Flags   MSS Window  irtt Iface
+	lines = lines[2:]
+	re := regexp.MustCompile(`\s+`)
+
+	ipRoutes := make([]metrics.IPRoute, 0)
+
+	// Parse the output
+	for _, line := range lines {
+		fields := re.Split(line, -1)
+		if len(fields) >= 8 {
+			ipRoute := metrics.IPRoute{
+				Destination: fields[0],
+				Gateway:     fields[1],
+				Genmask:     fields[2],
+				Flags:       fields[3],
+				MSS:         fields[4],
+				Window:      fields[5],
+				IRTT:        fields[6],
+				Interface:   fields[7],
+			}
+
+			ipRoutes = append(ipRoutes, ipRoute)
+		}
+	}
+
+	return ipRoutes, nil
+}
+
 // GetHostInfo returns host info
 func GetHostInfo() (metrics.HostInfo, error) {
 	hostInfo, err := host.Info()
 	if err != nil {
 		return metrics.HostInfo{}, err
+	}
+
+	systemdInfos, err := GetSystemdInfo()
+	if err != nil {
+		log.Errorf("GetHostInfo", "GetSystemdInfo error: %v", err)
+		systemdInfos = make([]metrics.SystemdInfo, 0)
 	}
 
 	return metrics.HostInfo{
@@ -202,8 +266,44 @@ func GetHostInfo() (metrics.HostInfo, error) {
 			VirtualizationSystem: hostInfo.VirtualizationSystem,
 			VirtualizationRole:   hostInfo.VirtualizationRole,
 			HostID:               hostInfo.HostID,
+
+			SystemdInfos: systemdInfos,
 		},
 	}, nil
+}
+
+func GetSystemdInfo() ([]metrics.SystemdInfo, error) {
+	cmd := exec.Command("systemctl", "list-unit-files", "--type=service", "--state=enabled", "--no-pager", "--plain", "--no-legend")
+	// cmd := exec.Command("systemctl", "list-unit-files", "--type=service", "--no-pager", "--plain", "--no-legend")
+	output, err := cmd.Output()
+	if err != nil {
+		fmt.Println("Error:", err)
+
+		return []metrics.SystemdInfo{}, err
+	}
+
+	lines := strings.Split(string(output), "\n")
+	if len(lines) < 2 {
+		return []metrics.SystemdInfo{}, fmt.Errorf("invalid output")
+	}
+
+	re := regexp.MustCompile(`\s+`)
+	systemdInfos := make([]metrics.SystemdInfo, 0)
+
+	for _, line := range lines {
+		fields := re.Split(line, -1)
+		// fields := strings.Fields(line)
+		if len(fields) >= 2 {
+			systemdInfo := metrics.SystemdInfo{
+				Name:   fields[0],
+				Status: fields[1],
+			}
+
+			systemdInfos = append(systemdInfos, systemdInfo)
+		}
+	}
+
+	return systemdInfos, nil
 }
 
 // GetHostInfoJson returns host info in json format and base64 encoded

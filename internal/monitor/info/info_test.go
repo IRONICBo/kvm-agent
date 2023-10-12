@@ -3,8 +3,45 @@ package info
 import (
 	"fmt"
 	"kvm-agent/internal/utils"
+	"os/exec"
+	"regexp"
+	"strings"
 	"testing"
 )
+
+func TestGetSystemdInfo(t *testing.T) {
+	systemdInfos, _ := GetSystemdInfo()
+	fmt.Println(systemdInfos)
+}
+
+func TestGetIPRoutes2(t *testing.T) {
+	netInfo, _ := GetIPRouteInfo()
+	fmt.Println(netInfo)
+}
+
+func TestGetIPRoutes(t *testing.T) {
+	cmd := exec.Command("netstat", "-r")
+	output, err := cmd.Output()
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+
+	lines := strings.Split(string(output), "\n")
+
+	re := regexp.MustCompile(`\s+`)
+
+	for _, line := range lines {
+		fields := re.Split(line, -1)
+		if len(fields) >= 4 {
+			destination := fields[0]
+			gateway := fields[1]
+			genmask := fields[2]
+			flags := fields[3]
+			fmt.Printf("Destination: %s, Gateway: %s, Genmask: %s, Flags: %s\n", destination, gateway, genmask, flags)
+		}
+	}
+}
 
 func TestGetInfos(t *testing.T) {
 	cpuinfo, _ := utils.DecompressText([]byte(GetCpuInfoJsonCompressed()))

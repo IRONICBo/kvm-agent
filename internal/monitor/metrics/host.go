@@ -20,6 +20,14 @@ type HostInfoStat struct {
 	VirtualizationSystem string `json:"virtualization_system"`
 	VirtualizationRole   string `json:"virtualization_role"` // guest or host
 	HostID               string `json:"hostid"`              // ex: uuid
+
+	SystemdInfos []SystemdInfo `json:"systemd_infos"`
+}
+
+// SystemdInfo contains systemd information.
+type SystemdInfo struct {
+	Name   string `json:"name"`
+	Status string `json:"status"`
 }
 
 // TODO: ignore
