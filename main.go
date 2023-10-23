@@ -28,6 +28,7 @@ func main() {
 	tasks.RegisterGuestAgentOffline(config.Config.Agent)
 	go tasks.StartGuestMonitorTask(config.Config.Agent, config.Config.Agent.GZip)
 	go tasks.StartGuestTriggerTask(config.Config.Agent, config.Config.Agent.GZip)
+	go tasks.StartGuestPluginTask(config.Config.Server)
 
 	for {
 	}

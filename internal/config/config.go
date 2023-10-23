@@ -15,6 +15,10 @@ func ConfigInit(configPath string) {
 			Debug:   GetBool("app.debug"),
 			LogFile: GetString("app.log_file"),
 		},
+		Server: Server{
+			IP:   GetString("server.ip"),
+			Port: GetInt("server.port"),
+		},
 		Agent: Agent{
 			UUID:   GetString("agent.uuid"),
 			Period: GetInt("agent.period"),
@@ -36,10 +40,11 @@ func ConfigInit(configPath string) {
 }
 
 type config struct {
-	App   App
-	Agent Agent
-	Redis Redis
-	DM    DM
+	App    App
+	Server Server
+	Agent  Agent
+	Redis  Redis
+	DM     DM
 }
 
 // App config.
@@ -47,6 +52,12 @@ type App struct {
 	Version string `mapstructure:"version"`
 	Debug   bool   `mapstructure:"debug"`
 	LogFile string `mapstructure:"log_file"`
+}
+
+// Server config.
+type Server struct {
+	IP   string `mapstructure:"ip"`
+	Port int    `mapstructure:"port"`
 }
 
 // Agent config.

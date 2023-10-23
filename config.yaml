@@ -14,6 +14,10 @@ app:
   debug: true # debug mode
   log_file: /var/log/kvm-agent # log mode
 
+server:
+  ip: 127.0.0.1
+  port: 6000
+
 agent:
   uuid: 6e8c2828-5460-49a2-99a9-6ed809ae4d1d # agent uuid
   period: 10 # collect data every 5 seconds
