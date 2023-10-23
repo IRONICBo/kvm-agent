@@ -23,19 +23,16 @@ func SendResult(info request.PluginInfo, result string) error {
 	client := resty.New()
 
 	resp, err := client.R().
-		SetHeader("Content-Type", "application/json").
-		SetBody(fmt.Sprintf(
-			`{"stateCode":"%s", "statePlugId":"%d", "stateResponse":"%s"}`,
-			PluginStateSuccess, info.PlugStateId, result,
-		)).
-		Post(fmt.Sprintf("http://%s/%s", info.InterfaceAddr, info.InterfacePath))
+		// SetHeader("Content-Type", "application/json").
+		SetBody(map[string]interface{}{"stateCode": 1, "statePlugId": info.PlugStateId, "stateResponse": result}).
+		Post(fmt.Sprintf("http://%s%s", info.InterfaceAddr, info.InterfacePath))
 	if err != nil {
 		log.Errorf("SendResult", "client.R().Post error: %v", err)
 		return err
 	}
 
-	log.Debugf("SendResult", "resp: %+v", resp)
-	fmt.Println("resp:", resp)
+	log.Debugf("SendResult", "resp: %+v", resp, fmt.Sprintf("http://%s%s", info.InterfaceAddr, info.InterfacePath))
+	fmt.Println("resp:", resp, info.PlugStateId, fmt.Sprintf("http://%s%s", info.InterfaceAddr, info.InterfacePath))
 
 	return nil
 }
@@ -44,6 +41,7 @@ func RunPlugin(c *gin.Context) {
 	var pluginInfo request.PluginInfo
 	err := c.ShouldBindJSON(&pluginInfo)
 	if err != nil {
+		fmt.Println("c.ShouldBindJSON error:", err)
 		log.Errorf("RunPlugin", "c.ShouldBindJSON error: %v", err)
 
 		return
@@ -62,6 +60,7 @@ func RunPlugin(c *gin.Context) {
 	var paramList []Param
 	err = json.Unmarshal([]byte(pluginInfo.PlugRunParams), &paramList)
 	if err != nil {
+		fmt.Println("json.Unmarshal error:", err)
 		log.Errorf("RunPlugin", "json.Unmarshal error: %v", err)
 
 		return
