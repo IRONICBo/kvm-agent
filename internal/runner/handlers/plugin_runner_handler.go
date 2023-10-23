@@ -22,7 +22,7 @@ const (
 func SendResult(info request.PluginInfo, result string) error {
 	client := resty.New()
 
-	_, err := client.R().
+	resp, err := client.R().
 		SetHeader("Content-Type", "application/json").
 		SetBody(fmt.Sprintf(
 			`{"stateCode":"%s", "statePlugId":"%d", "stateResponse":"%s"}`,
@@ -33,6 +33,9 @@ func SendResult(info request.PluginInfo, result string) error {
 		log.Errorf("SendResult", "client.R().Post error: %v", err)
 		return err
 	}
+
+	log.Debugf("SendResult", "resp: %+v", resp)
+	fmt.Println("resp:", resp)
 
 	return nil
 }
@@ -46,11 +49,12 @@ func RunPlugin(c *gin.Context) {
 		return
 	}
 
+	fmt.Println("pluginInfo:", pluginInfo)
 	log.Debugf("RunPlugin", "pluginInfo: %+v", pluginInfo)
 
 	// parse json params
 	// [{"key":"host","value":"123"}]
-	var params string
+	var params []string
 	type Param struct {
 		Key   string `json:"key"`
 		Value string `json:"value"`
@@ -64,7 +68,8 @@ func RunPlugin(c *gin.Context) {
 	}
 
 	for _, param := range paramList {
-		params += fmt.Sprintf("%s %s ", param.Key, param.Value)
+		// params += fmt.Sprintf("%s %s ", param.Key, param.Value)
+		params = append(params, fmt.Sprintf("--%s", param.Key), param.Value)
 	}
 	log.Debugf("RunPlugin", "params: %s", params)
 
@@ -83,7 +88,7 @@ func RunPlugin(c *gin.Context) {
 		return
 	}
 
-	cmd := exec.Command(pluginInfo.PlugRunCommand, params)
+	cmd := exec.Command(pluginInfo.PlugRunCommand, params...)
 	cmd.Dir = ScriptPath
 	fmt.Println("cmd:", cmd)
 	var out bytes.Buffer
