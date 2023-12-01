@@ -36,7 +36,7 @@ func NewTriggerDao() *TriggerDao {
 // PushListWithRetry push list with retry.
 func (d *TriggerDao) PushListWithRetry(key, data string, retry, interval int) error {
 	// Push to redis.
-	// check list length, if length > 100, wait forever.
+	// check list length, if length > 20, wait forever.
 	// d.mu.Lock()
 	// defer d.mu.Unlock()
 
@@ -53,13 +53,13 @@ func (d *TriggerDao) PushListWithRetry(key, data string, retry, interval int) er
 		return errors.New("interval times is 0")
 	}
 
-	// check list length, if length > 100, wait forever.
-	if length, _ := (*d.cache).LLen(d.ctx, key); length > 100 {
+	// check list length, if length > 20, wait forever.
+	if length, _ := (*d.cache).LLen(d.ctx, key); length > 20 {
 		// d.mu.Unlock()
 		time.Sleep(time.Duration(interval) * time.Second)
 
 		d.PushListWithRetry(key, data, retry-1, interval)
-		return errors.New("list length is more than 100")
+		return errors.New("list length is more than 20")
 	}
 
 	err := (*d.cache).LPush(d.ctx, key, data)

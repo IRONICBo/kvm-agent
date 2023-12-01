@@ -29,7 +29,7 @@ func (s *TriggerService) GuestTriggerPush(uuid, value string) error {
 	log.Infof("GuestTriggerPush", "%s value: %s", uuid, value)
 
 	// Push to redis.
-	// check list length, if length > 100, wait forever.
+	// check list length, if length > 20, wait forever.
 	err := s.TriggerDao.PushListWithRetry(TRIGGER_PERFIX+uuid, value, 10, 60)
 	if err != nil {
 		log.Errorf("GuestTriggerPush", "PushListWithRetry error: %s", err.Error())

@@ -30,7 +30,7 @@ func (s *MonitorService) GuestMonitorPush(uuid, data string, interval int) error
 	log.Infof("GuestMonitorPush", "%s data: %s", uuid, data)
 
 	// Push to redis.
-	// check list length, if length > 100, wait forever.
+	// check list length, if length > 20, wait forever.
 	err := s.MonitorDao.PushListWithRetry(fmt.Sprintf("%s%s", MONITOR_PERFIX, uuid), data, 10, interval)
 	if err != nil {
 		return err
