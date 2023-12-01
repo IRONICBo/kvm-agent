@@ -1,5 +1,9 @@
 package config
 
+import (
+	"github.com/spf13/viper"
+)
+
 // Config global config instance.
 var Config *config
 
@@ -36,15 +40,32 @@ func ConfigInit(configPath string) {
 			Username: GetString("dm.username"),
 			Password: GetString("dm.password"),
 		},
+		Hardware: Hardware{
+			IPMI_Enable: GetBool("hardware.ipmi_enable"),
+			SNMP_Enable: GetBool("hardware.snmp_enable"),
+		},
+		IPMI: func() []IPMI {
+			ipmi := []IPMI{}
+			_ = viper.UnmarshalKey("ipmi", &ipmi)
+			return ipmi
+		}(),
+		SNMP: func() []SNMP {
+			snmp := []SNMP{}
+			_ = viper.UnmarshalKey("snmp", &snmp)
+			return snmp
+		}(),
 	}
 }
 
 type config struct {
-	App    App
-	Server Server
-	Agent  Agent
-	Redis  Redis
-	DM     DM
+	App      App
+	Server   Server
+	Agent    Agent
+	Redis    Redis
+	DM       DM
+	Hardware Hardware
+	IPMI     []IPMI
+	SNMP     []SNMP
 }
 
 // App config.
@@ -81,4 +102,27 @@ type DM struct {
 	Port     int    `mapstructure:"port"`
 	Username string `mapstructure:"username"`
 	Password string `mapstructure:"password"`
+}
+
+// Hardware config.
+type Hardware struct {
+	IPMI_Enable bool `mapstructure:"ipmi_enable"`
+	SNMP_Enable bool `mapstructure:"snmp_enable"`
+}
+
+// IPMI config.
+type IPMI struct {
+	Name     string `mapstructure:"name"`
+	IP       string `mapstructure:"ip"`
+	Port     int    `mapstructure:"port"`
+	Username string `mapstructure:"username"`
+	Password string `mapstructure:"password"`
+}
+
+// SNMP config.
+type SNMP struct {
+	Name      string `mapstructure:"name"`
+	IP        string `mapstructure:"ip"`
+	Port      int    `mapstructure:"port"`
+	Community string `mapstructure:"community"`
 }

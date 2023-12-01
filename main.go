@@ -15,6 +15,11 @@ func main() {
 
 	// init
 	config.ConfigInit(*configPath)
+
+	// fmt.Printf("[kvm-agent] Load config from %s ... ", *configPath)
+	// config.Config
+	// fmt.Printf("%+v\n", config.Config)
+
 	utils.KVMAgentBanner()
 	log.InitLogger(config.Config.App)
 	conn.InitDMDB(config.Config.DM, config.Config.App.Debug)

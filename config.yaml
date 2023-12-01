@@ -34,3 +34,39 @@ dm:
   port: 5236
   username: SYSDBA
   password: SYSDBA
+
+hardware:
+  ipmi_enable: true
+  snmp_enable: false
+
+ipmi:
+  - name: bmc1
+    ip: 168.66.1.106
+    port: 623
+    username: root
+    password: 0penBmc
+  - name: bmc2
+    ip: 168.66.1.107
+    port: 623
+    username: root
+    password: 0penBmc
+  - name: bmc3
+    ip: 168.66.1.108
+    port: 623
+    username: root
+    password: 0penBmc
+  - name: bmc4
+    ip: 168.66.1.109
+    port: 623
+    username: root
+    password: 0penBmc
+
+snmp: # 2c version
+  - name: snmp1
+    ip: 168.66.1.106
+    port: 161
+    community: public
+  - name: snmp2
+    ip: 168.66.1.107
+    port: 161
+    community: public
