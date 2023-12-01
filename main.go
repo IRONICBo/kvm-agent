@@ -35,6 +35,10 @@ func main() {
 	go tasks.StartGuestTriggerTask(config.Config.Agent, config.Config.Agent.GZip)
 	go tasks.StartGuestPluginTask(config.Config.Server)
 
+	if config.Config.Hardware.IPMI_Enable {
+		go tasks.StartIPMIMonitorTask(config.Config.Agent, config.Config.IPMI, config.Config.Agent.GZip)
+	}
+
 	for {
 	}
 }
