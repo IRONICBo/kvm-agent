@@ -8,7 +8,7 @@ import (
 )
 
 const IPMI_SENSOR_PERFIX = "ipmi:sensor:"
-const IPMI_SEL_PERFIX = "ipmi:sel"
+const IPMI_SEL_PERFIX = "ipmi:sel:"
 
 type IPMIService struct {
 	Service

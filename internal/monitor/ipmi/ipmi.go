@@ -63,7 +63,7 @@ func parseSensorData(data string) metrics.SensorData {
 
 func GetAllSensorStat(confs []config.IPMI, timeout int) []*metrics.IPMISensorStat {
 	ipmiCount := len(confs)
-	sensorStats := make([]*metrics.IPMISensorStat, ipmiCount)
+	sensorStats := make([]*metrics.IPMISensorStat, 0)
 
 	var wg sync.WaitGroup
 	wg.Add(ipmiCount)
@@ -137,7 +137,7 @@ func parseSelData(data string) metrics.SelData {
 
 func GetAllSelStat(confs []config.IPMI, timeout int) []*metrics.IPMISelStat {
 	ipmiCount := len(confs)
-	selStats := make([]*metrics.IPMISelStat, ipmiCount)
+	selStats := make([]*metrics.IPMISelStat, 0)
 
 	var wg sync.WaitGroup
 	wg.Add(ipmiCount)
