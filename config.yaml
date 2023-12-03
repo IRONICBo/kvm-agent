@@ -36,8 +36,8 @@ dm:
   password: SYSDBA
 
 hardware:
-  ipmi_enable: true
-  snmp_enable: false
+  ipmi_enable: false
+  snmp_enable: true
 
 ipmi:
   - name: bmc1
