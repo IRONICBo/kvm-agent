@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"kvm-agent/internal/dal/dao"
-	"kvm-agent/internal/log"
 )
 
 const MONITOR_PERFIX = "monitor:"
@@ -27,7 +26,7 @@ func NewMonitorService(c context.Context) *MonitorService {
 
 // GuestMonitorPush update guest monitor info.
 func (s *MonitorService) GuestMonitorPush(uuid, data string, interval int) error {
-	log.Infof("GuestMonitorPush", "%s data: %s", uuid, data)
+	// log.Infof("GuestMonitorPush", "%s data: %s", uuid, data)
 
 	// Push to redis.
 	// check list length, if length > 20, wait forever.

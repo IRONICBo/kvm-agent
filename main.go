@@ -38,6 +38,9 @@ func main() {
 	if config.Config.Hardware.IPMI_Enable {
 		go tasks.StartIPMIMonitorTask(config.Config.Agent, config.Config.IPMI, config.Config.Agent.GZip)
 	}
+	if config.Config.Hardware.SNMP_Enable {
+		go tasks.StartSNMPTask(config.Config.Agent, config.Config.SNMP, config.Config.Agent.GZip)
+	}
 
 	for {
 	}

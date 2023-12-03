@@ -1,7 +1,6 @@
 package status
 
 import (
-	"fmt"
 	"kvm-agent/internal/log"
 	"kvm-agent/internal/monitor/metrics"
 	"sync"
@@ -445,7 +444,7 @@ func GetAllStat(uuid string, timeout int) metrics.MetricStat {
 
 		// Calc alert data
 		metric.AlertStat = calcAlertData(&metric)
-		fmt.Printf("data: %#v", metric)
+		// fmt.Printf("data: %#v", metric)
 
 		return metric
 	}

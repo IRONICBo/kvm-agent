@@ -26,7 +26,7 @@ func NewTriggerrService(c context.Context) *TriggerService {
 
 // GuestTriggerPush update guest trigger info.
 func (s *TriggerService) GuestTriggerPush(uuid, value string) error {
-	log.Infof("GuestTriggerPush", "%s value: %s", uuid, value)
+	// log.Infof("GuestTriggerPush", "%s value: %s", uuid, value)
 
 	// Push to redis.
 	// check list length, if length > 20, wait forever.

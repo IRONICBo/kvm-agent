@@ -10,7 +10,7 @@ func GetIPMISensorList(host, port, username, password string) (string, error) {
 	cmd := "ipmitool"
 	args := []string{"-I", "lanplus", "-H", host, "-p", port, "-U", username, "-P", password, "sensor", "list"}
 
-	if !isCommandAvailable(cmd) {
+	if !IsCommandAvailable(cmd) {
 		return "", errors.New("command '%s' is not available")
 	}
 
@@ -27,7 +27,7 @@ func GetIPMISelList(host, port, username, password string) (string, error) {
 	cmd := "ipmitool"
 	args := []string{"-I", "lanplus", "-H", host, "-p", port, "-U", username, "-P", password, "sel", "list"}
 
-	if !isCommandAvailable(cmd) {
+	if !IsCommandAvailable(cmd) {
 		return "", errors.New("command '%s' is not available")
 	}
 

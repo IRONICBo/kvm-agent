@@ -9,6 +9,13 @@ import (
 	"github.com/nfjBill/gorm-driver-dm/dmr"
 )
 
+// StringToInt
+func StringToInt(s string) int {
+	var result int
+	fmt.Sscanf(s, "%d", &result)
+	return result
+}
+
 // TODO: ignore
 // StringToDMClob convert string to dmr.DmClob
 func StringToDMClob(s string) dmr.DmClob {

@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"kvm-agent/internal/dal/dao"
-	"kvm-agent/internal/log"
 )
 
 const SNMP_PERFIX = "snmp:"
@@ -26,8 +25,8 @@ func NewSNMPService(c context.Context) *SNMPService {
 }
 
 // GuestMonitorPush update guest monitor info.
-func (s *MonitorService) GuestSNMPPush(uuid, data string, interval int) error {
-	log.Infof("GuestSNMPPush", "%s data: %s", uuid, data)
+func (s *SNMPService) GuestSNMPPush(uuid, data string, interval int) error {
+	// log.Infof("GuestSNMPPush", "%s data: %s", uuid, data)
 
 	// Push to redis.
 	// check list length, if length > 20, wait forever.

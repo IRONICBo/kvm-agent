@@ -51,7 +51,7 @@ func StartIPMIMonitorTask(config config.Agent, ipmisConfig []config.IPMI, gzip b
 				}
 
 				if err = svc.IPMISensorMonitorPush(config.UUID, string(metricString), config.Period); err != nil {
-					log.Errorf("StartIPMIMonitorTask", "svc.GuestMonitorPush error: %v", err)
+					log.Errorf("StartIPMIMonitorTask", "svc.IPMISensorMonitorPush error: %v", err)
 				}
 			}
 		case <-sel_ticker.C:

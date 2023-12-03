@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"kvm-agent/internal/dal/dao"
-	"kvm-agent/internal/log"
 )
 
 const IPMI_SENSOR_PERFIX = "ipmi:sensor:"
@@ -28,7 +27,7 @@ func NewIPMIService(c context.Context) *IPMIService {
 
 // IPMISensorMonitorPush update ipmi sensor monitor info.
 func (s *IPMIService) IPMISensorMonitorPush(uuid, data string, interval int) error {
-	log.Infof("IPMIMonitorPush", "%s data: %s", uuid, data)
+	// log.Infof("IPMIMonitorPush", "%s data: %s", uuid, data)
 
 	// Push to redis.
 	// check list length, if length > 20, wait forever.
@@ -42,7 +41,7 @@ func (s *IPMIService) IPMISensorMonitorPush(uuid, data string, interval int) err
 
 // IPMISelMonitorPush update ipmi sel monitor info.
 func (s *IPMIService) IPMISelMonitorPush(uuid, data string, interval int) error {
-	log.Infof("IPMIMonitorPush", "%s data: %s", uuid, data)
+	// log.Infof("IPMIMonitorPush", "%s data: %s", uuid, data)
 
 	// Push to redis.
 	// check list length, if length > 20, wait forever.

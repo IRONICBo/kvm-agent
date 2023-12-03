@@ -63,10 +63,6 @@ ipmi:
 
 snmp: # 2c version
   - name: snmp1
-    ip: 168.66.1.106
-    port: 161
-    community: public
-  - name: snmp2
-    ip: 168.66.1.107
+    ip: 127.0.0.1
     port: 161
     community: public
