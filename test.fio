@@ -1,0 +1,12 @@
+[global]
+ioengine=libaio
+direct=1
+runtime=60s
+time_based
+filename=main.go
+size=1G
+
+[random-read]
+rw=randread
+bs=4k
+numjobs=4

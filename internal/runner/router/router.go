@@ -32,5 +32,11 @@ func InitRouter() *gin.Engine {
 	r := gin.Default()
 	r.POST("/api/plug/run", handlers.RunPlugin)
 
+	// Default task
+	r.POST("/api/plug/ping", handlers.RunPingPlug)
+	r.POST("/api/plug/fio", handlers.RunFIOPlug)
+	r.POST("/api/plug/dbtest", handlers.RunDBTestPlug)
+	r.POST("/api/plug/ptp4l", handlers.RunPTP4LPlug)
+
 	return r
 }
