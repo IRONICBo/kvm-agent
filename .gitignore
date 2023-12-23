@@ -8,3 +8,7 @@ build/deps/*
 dist/
 
 main
+
+vendor
+vendor/*
+dist_1/*
