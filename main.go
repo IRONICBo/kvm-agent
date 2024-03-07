@@ -31,16 +31,16 @@ func main() {
 
 	tasks.InitGuestInfo(config.Config.Agent)
 	tasks.RegisterGuestAgentOffline(config.Config.Agent)
-	go tasks.StartGuestMonitorTask(config.Config.Agent, config.Config.Agent.GZip)
-	go tasks.StartGuestTriggerTask(config.Config.Agent, config.Config.Agent.GZip)
+	// go tasks.StartGuestMonitorTask(config.Config.Agent, config.Config.Agent.GZip)
+	// go tasks.StartGuestTriggerTask(config.Config.Agent, config.Config.Agent.GZip)
 	go tasks.StartGuestPluginTask(config.Config.Server)
 
-	if config.Config.Hardware.IPMI_Enable {
-		go tasks.StartIPMIMonitorTask(config.Config.Agent, config.Config.IPMI, config.Config.Agent.GZip)
-	}
-	if config.Config.Hardware.SNMP_Enable {
-		go tasks.StartSNMPTask(config.Config.Agent, config.Config.SNMP, config.Config.Agent.GZip)
-	}
+	// if config.Config.Hardware.IPMI_Enable {
+	// 	go tasks.StartIPMIMonitorTask(config.Config.Agent, config.Config.IPMI, config.Config.Agent.GZip)
+	// }
+	// if config.Config.Hardware.SNMP_Enable {
+	// 	go tasks.StartSNMPTask(config.Config.Agent, config.Config.SNMP, config.Config.Agent.GZip)
+	// }
 
 	for {
 	}
