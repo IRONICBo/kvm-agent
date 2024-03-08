@@ -8,6 +8,7 @@ require (
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/go-resty/resty/v2 v2.10.0
 	github.com/gosnmp/gosnmp v1.37.0
+	github.com/hashicorp/golang-lru/v2 v2.0.7
 	github.com/hpcloud/tail v1.0.0
 	github.com/nfjBill/gorm-driver-dm v1.0.1
 	github.com/pkg/errors v0.9.1

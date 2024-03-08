@@ -13,6 +13,18 @@ type PluginInfo struct {
 	PlugPath         string  `json:"plugPath"`
 }
 
+type HttpPluginParam struct {
+	ExecResultId int64 `json:"execResultId"`
+	PlugId       int64 `json:"plugId"`
+}
+
+type HttpPluginResult struct {
+	ExecResultId       int64  `json:"execResultId"`
+	PlugId             int64  `json:"plugId"`
+	PlugResultText     string `json:"plugResult"`
+	PlugResultFilePath string `json:"plugResultFilePath"`
+}
+
 // Deprecated: Use PluginInfo instead
 // type PluginInfo struct {
 // 	PlugStateId    string `json:"plugStateId"`

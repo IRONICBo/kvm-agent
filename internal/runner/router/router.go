@@ -31,6 +31,8 @@ func InitRouter() *gin.Engine {
 
 	r := gin.Default()
 	r.POST("/api/plug/run", handlers.RunPlugin)
+	r.GET("/api/plug/param", handlers.GetPluginParam)
+	r.POST("/api/plug/result", handlers.SendPluginResult)
 
 	// Default task
 	r.POST("/api/plug/ping", handlers.RunPingPlug)
