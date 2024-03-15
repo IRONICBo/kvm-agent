@@ -38,3 +38,7 @@ nfpms:
         scripts:
           preinstall: ./build/scripts/preinstall.sh
           postremove: ./build/scripts/postremove.sh
+      deb:
+        scripts:
+          postinstall: ./build/scripts/postinstall.sh
+          preremove: ./build/scripts/preremove.sh
