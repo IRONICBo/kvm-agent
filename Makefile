@@ -2,7 +2,7 @@ SHELL := /bin/bash
 DIRS=$(shell ls)
 GO=go
 NFPM=nfpm
-NAME=kvm-agent
+NAME=kvm-agent-plug
 REPO_TRACK=repotrack # dnf download https://dnf-plugins-core.readthedocs.io/en/latest/download.html
 
 # root

@@ -31,7 +31,7 @@ nfpms:
       - src: /usr/bin/kvm-agent-plug
         dst: /sbin/kvm-agent-plug
         type: symlink
-      - src: build/systemd/kvm-agent-plug.service
+      - src: build/systemd/kvm-agent.service
         dst: /lib/systemd/system/kvm-agent-plug.service
     overrides:
       rpm:
