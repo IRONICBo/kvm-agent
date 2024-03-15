@@ -13,6 +13,7 @@ app:
   version: 1.0.0
   debug: true # debug mode
   log_file: /var/log/kvm-agent # log mode
+  ban_monitor: true # monitor mode
 
 server:
   ip: 127.0.0.1

@@ -15,9 +15,10 @@ func ConfigInit(configPath string) {
 	// init Configuration
 	Config = &config{
 		App: App{
-			Version: GetString("app.version"),
-			Debug:   GetBool("app.debug"),
-			LogFile: GetString("app.log_file"),
+			Version:    GetString("app.version"),
+			Debug:      GetBool("app.debug"),
+			LogFile:    GetString("app.log_file"),
+			BanMonitor: GetBool("app.ban_monitor"),
 		},
 		Server: Server{
 			IP:   GetString("server.ip"),
@@ -70,9 +71,10 @@ type config struct {
 
 // App config.
 type App struct {
-	Version string `mapstructure:"version"`
-	Debug   bool   `mapstructure:"debug"`
-	LogFile string `mapstructure:"log_file"`
+	Version    string `mapstructure:"version"`
+	Debug      bool   `mapstructure:"debug"`
+	LogFile    string `mapstructure:"log_file"`
+	BanMonitor bool   `mapstructure:"ban_monitor"`
 }
 
 // Server config.

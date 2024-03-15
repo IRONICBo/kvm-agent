@@ -15,32 +15,28 @@ func main() {
 
 	// init
 	config.ConfigInit(*configPath)
-
-	// fmt.Printf("[kvm-agent] Load config from %s ... ", *configPath)
-	// config.Config
-	// fmt.Printf("%+v\n", config.Config)
-
 	utils.KVMAgentBanner()
 	log.InitLogger(config.Config.App)
-	conn.InitDMDB(config.Config.DM, config.Config.App.Debug)
-	conn.InitRedisDB(config.Config.Redis)
-
 	defer func() {
 		log.GetLogger().Sync()
 	}()
 
-	tasks.InitGuestInfo(config.Config.Agent)
-	tasks.RegisterGuestAgentOffline(config.Config.Agent)
-	// go tasks.StartGuestMonitorTask(config.Config.Agent, config.Config.Agent.GZip)
-	// go tasks.StartGuestTriggerTask(config.Config.Agent, config.Config.Agent.GZip)
-	go tasks.StartGuestPluginTask(config.Config.Server)
+	if !config.Config.App.BanMonitor {
+		conn.InitDMDB(config.Config.DM, config.Config.App.Debug)
+		conn.InitRedisDB(config.Config.Redis)
+		tasks.InitGuestInfo(config.Config.Agent)
+		tasks.RegisterGuestAgentOffline(config.Config.Agent)
+		go tasks.StartGuestMonitorTask(config.Config.Agent, config.Config.Agent.GZip)
+		go tasks.StartGuestTriggerTask(config.Config.Agent, config.Config.Agent.GZip)
+		if config.Config.Hardware.IPMI_Enable {
+			go tasks.StartIPMIMonitorTask(config.Config.Agent, config.Config.IPMI, config.Config.Agent.GZip)
+		}
+		if config.Config.Hardware.SNMP_Enable {
+			go tasks.StartSNMPTask(config.Config.Agent, config.Config.SNMP, config.Config.Agent.GZip)
+		}
+	}
 
-	// if config.Config.Hardware.IPMI_Enable {
-	// 	go tasks.StartIPMIMonitorTask(config.Config.Agent, config.Config.IPMI, config.Config.Agent.GZip)
-	// }
-	// if config.Config.Hardware.SNMP_Enable {
-	// 	go tasks.StartSNMPTask(config.Config.Agent, config.Config.SNMP, config.Config.Agent.GZip)
-	// }
+	go tasks.StartGuestPluginTask(config.Config.Server)
 
 	for {
 	}
