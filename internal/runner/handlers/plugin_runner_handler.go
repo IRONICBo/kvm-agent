@@ -147,6 +147,7 @@ func SendPluginResult(c *gin.Context) {
 			return
 		}
 	case PluginResultTypeFile:
+		// err = SendResult(pluginInfo, "", 0, "/home/asklv/Projects/kvm-agent/internal/runner/handlers/plugin_runner_handler.go")
 		err = SendResult(pluginInfo, "", 0, httpPluginResult.PlugResultFilePath)
 		if err != nil {
 			log.Errorf("SendPluginResult", "SendResult error: %v", err)
@@ -268,18 +269,23 @@ func RunPlugin(c *gin.Context) {
 	}
 
 	for i := 0; i < pluginInfo.ExecNumber; i++ {
-		// Append id to params
-		if pluginInfo.PlugType == PluginTypeHTTP {
-			params = append(params, fmt.Sprintf("--%s", "pluginId"), fmt.Sprintf("%d", pluginInfo.PlugId))
-			params = append(params, fmt.Sprintf("--%s", "execResultId"), fmt.Sprintf("%d", pluginInfo.ExecResultIdList[i]))
+		var onceParams []string
+		if pluginInfo.PlugType == PluginTypeCommand {
+			onceParams = params
 		}
 
-		log.Debugf("RunPlugin", "params: %s", params)
+		// Append id to params
+		if pluginInfo.PlugType == PluginTypeHTTP {
+			onceParams = append(onceParams, fmt.Sprintf("--%s", "pluginId"), fmt.Sprintf("%d", pluginInfo.PlugId))
+			onceParams = append(onceParams, fmt.Sprintf("--%s", "execResultId"), fmt.Sprintf("%d", pluginInfo.ExecResultIdList[i]))
+		}
+
+		log.Debugf("RunPlugin", "params: %s", onceParams)
 
 		// set cmd current dir
 		// cmd := exec.Command(pluginInfo.ExecCommand, params...)
 		cmdParams := strings.Split(pluginInfo.ExecCommand, " ")
-		cmdParams = append(cmdParams, params...)
+		cmdParams = append(cmdParams, onceParams...)
 		var cmd *exec.Cmd
 		if len(cmdParams) < 2 {
 			cmd = exec.Command(cmdParams[0])

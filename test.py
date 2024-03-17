@@ -1,5 +1,7 @@
 import argparse
 import requests
+import subprocess
+import json
 
 def get_plugin_params(plugin_id, exec_result_id):
     url = "http://127.0.0.1:6000/api/plug/param?execResultId=" + str(exec_result_id) + "&plugId=" + str(plugin_id)
@@ -9,6 +11,15 @@ def get_plugin_params(plugin_id, exec_result_id):
     if response.status_code == 200:
         print("Successfully fetched plugin params:")
         print(response.json())
+        params_json = response.json()['params']
+        params = json.loads(params_json)
+        print("Params:", params)
+        result = {}
+        for param in params:
+            result[param['key']] = param['value']
+        print("Assembled result:", result)
+        
+        return result
     else:
         print("Failed to fetch plugin params")
 
@@ -33,10 +44,22 @@ def main():
     args = parser.parse_args()
 
     # Fetch plugin parameters
-    get_plugin_params(args.pluginId, args.execResultId)
+    result = get_plugin_params(args.pluginId, args.execResultId)
+    
+    # Run the command and capture the output
+    
+    command = "lat_mem_rd " + result['block'] + " " + result['stride']
+    print("Running command: " + command)
+    output = subprocess.check_output(command, shell=True).decode().strip()
+    # Extract the desired information from the output
+    result = output.split()[-1]
+    # Save the result to a file
+    file_path = "/tmp/result.txt"
+    with open(file_path, "w") as file:
+        file.write(result)
 
     # Example: Send a plugin result. Replace "Your result text here" with actual result text.
-    send_plugin_result(args.pluginId, args.execResultId, "Your result text here")
+    send_plugin_result(args.pluginId, args.execResultId, "OK", "/tmp/result.txt")
 
 if __name__ == "__main__":
     main()
