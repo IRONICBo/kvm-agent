@@ -33,6 +33,9 @@ const (
 
 var pluginCache = expirable.NewLRU[int64, request.PluginInfo](60, nil, time.Second*10)
 
+// For check plugin execId exist
+var pluginExecCache = expirable.NewLRU[int64, request.PluginInfo](60, nil, time.Second*10)
+
 // var pluginCache = expirable.NewLRU[int64, request.PluginInfo](60, nil, time.Millisecond*10)
 
 // func init() {
@@ -161,6 +164,9 @@ func SendPluginResult(c *gin.Context) {
 		}
 	}
 
+	// Try to remove plugin info from cache
+	pluginCache.Remove(httpPluginResult.PlugId)
+
 	// send http result
 	c.JSON(200, gin.H{
 		"code": 0,
@@ -254,19 +260,22 @@ func RunPlugin(c *gin.Context) {
 	}
 
 	// run script
-	err = os.Chdir(ScriptPath)
+	err = os.Chdir(pluginInfo.PlugPath)
 	if err != nil {
+		fmt.Println("os.Chdir error:", err)
 		log.Errorf("RunPlugin", "os.Chdir error: %v", err)
 
 		return
 	}
 	// set chmod 777
-	err = os.Chmod(ScriptPath, 0777)
-	if err != nil {
-		log.Errorf("RunPlugin", "os.Chmod error: %v", err)
+	// TODO: Need root permission
+	// err = os.Chmod(pluginInfo.PlugPath, 0777)
+	// if err != nil {
+	// 	fmt.Println("os.Chmod error:", err)
+	// 	log.Errorf("RunPlugin", "os.Chmod error: %v", err)
 
-		return
-	}
+	// 	return
+	// }
 
 	for i := 0; i < pluginInfo.ExecNumber; i++ {
 		var onceParams []string
@@ -280,6 +289,10 @@ func RunPlugin(c *gin.Context) {
 			onceParams = append(onceParams, fmt.Sprintf("--%s", "execResultId"), fmt.Sprintf("%d", pluginInfo.ExecResultIdList[i]))
 		}
 
+		// Store this cache for concurrent exec
+		pluginExecCache.Add(pluginInfo.ExecResultIdList[i], pluginInfo)
+
+		fmt.Println("onceParams:", onceParams)
 		log.Debugf("RunPlugin", "params: %s", onceParams)
 
 		// set cmd current dir
@@ -313,7 +326,17 @@ func RunPlugin(c *gin.Context) {
 		// }
 
 		result := out.String()
+		fmt.Println("RunPlugin result:", result)
 		log.Debugf("RunPlugin", "result: %s", result)
+
+		// Check if execId exist
+		pluginInfo, ok := pluginExecCache.Get(pluginInfo.ExecResultIdList[i])
+		if !ok {
+			fmt.Println("pluginInfo not found or update already")
+			log.Errorf("RunPlugin", "pluginInfo not found or update already")
+
+			return
+		}
 
 		// send result
 		switch pluginInfo.PlugType {
