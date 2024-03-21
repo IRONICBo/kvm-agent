@@ -31,10 +31,10 @@ const (
 
 // var pluginCache *expirable.LRU[int64, request.PluginInfo]
 
-var pluginCache = expirable.NewLRU[int64, request.PluginInfo](60, nil, time.Second*10)
+var pluginCache = expirable.NewLRU[int64, request.PluginInfo](1024, nil, time.Hour*24)
 
 // For check plugin execId exist
-var pluginExecCache = expirable.NewLRU[int64, request.PluginInfo](60, nil, time.Second*10)
+var pluginExecCache = expirable.NewLRU[int64, request.PluginInfo](1024, nil, time.Hour*24)
 
 // var pluginCache = expirable.NewLRU[int64, request.PluginInfo](60, nil, time.Millisecond*10)
 
