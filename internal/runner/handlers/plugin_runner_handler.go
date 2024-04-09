@@ -35,6 +35,7 @@ var pluginCache = expirable.NewLRU[int64, request.PluginInfo](1024, nil, time.Ho
 
 // For check plugin execId exist
 var pluginExecCache = expirable.NewLRU[int64, request.PluginInfo](1024, nil, time.Hour*24)
+var runningCache = expirable.NewLRU[int64, int](1024, nil, time.Hour*24)
 
 // var pluginCache = expirable.NewLRU[int64, request.PluginInfo](60, nil, time.Millisecond*10)
 
@@ -165,7 +166,9 @@ func SendPluginResult(c *gin.Context) {
 	}
 
 	// Try to remove plugin info from cache
-	pluginCache.Remove(httpPluginResult.PlugId)
+	// pluginCache.Remove(httpPluginResult.PlugId)
+	// Remove current execId
+	runningCache.Remove(httpPluginResult.ExecResultId)
 
 	// send http result
 	c.JSON(200, gin.H{
@@ -211,6 +214,52 @@ func SendResult(info request.PluginInfo, result string, idx int, path string) er
 	fmt.Println("resp:", resp, info.ExecResultIdList[idx], fmt.Sprintf("%s", info.ResponseUrl))
 
 	return nil
+}
+
+func StopPlugin(c *gin.Context) {
+	var httpPluginStop request.HttpPluginStop
+	err := c.ShouldBindJSON(&httpPluginStop)
+	if err != nil {
+		fmt.Println("c.ShouldBindJSON error:", err)
+		log.Errorf("StopPlugin", "c.ShouldBindJSON error: %v", err)
+
+		return
+	}
+
+	fmt.Printf("httpPluginStop: %#v\n", httpPluginStop)
+	log.Debugf("StopPlugin", "httpPluginStop: %+v", httpPluginStop)
+
+	// get plugin info
+	runningPID, ok := runningCache.Get(httpPluginStop.RecordId)
+	if !ok {
+		fmt.Println("runningPID not found")
+		log.Errorf("StopPlugin", "runningPID not found")
+
+		c.JSON(200, gin.H{
+			"code": -1,
+			"msg":  "runningPID not found",
+		})
+	}
+
+	// Run kill
+	kill := exec.Command("kill", "-9", fmt.Sprintf("%d", runningPID))
+	err = kill.Run()
+	if err != nil {
+		fmt.Println("kill.Run error:", err)
+		log.Errorf("StopPlugin", "kill.Run error: %v", err)
+
+		return
+	}
+
+	// send http result
+	c.JSON(200, gin.H{
+		"code": 0,
+		"msg":  "success",
+	})
+
+	// Try to remove plugin info from cache
+	pluginCache.Remove(httpPluginStop.PlugId)
+	runningCache.Remove(httpPluginStop.RecordId)
 }
 
 func RunPlugin(c *gin.Context) {
@@ -324,6 +373,9 @@ func RunPlugin(c *gin.Context) {
 		// 	fmt.Println("运行命令失败:", err)
 		// 	return
 		// }
+
+		// Store running pid
+		runningCache.Add(pluginInfo.ExecResultIdList[i], cmd.Process.Pid)
 
 		result := out.String()
 		fmt.Println("RunPlugin result:", result)

@@ -25,6 +25,12 @@ type HttpPluginResult struct {
 	PlugResultFilePath string `json:"plugResultFilePath"`
 }
 
+type HttpPluginStop struct {
+	PlugId      int64  `json:"plugId"`
+	RecordId    int64  `json:"recordId"`
+	ExecCommand string `json:"execCommand"`
+}
+
 // Deprecated: Use PluginInfo instead
 // type PluginInfo struct {
 // 	PlugStateId    string `json:"plugStateId"`
