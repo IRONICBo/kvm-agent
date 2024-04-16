@@ -11,6 +11,7 @@ import (
 	"os/exec"
 	"strconv"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -35,7 +36,7 @@ var pluginCache = expirable.NewLRU[int64, request.PluginInfo](1024, nil, time.Ho
 
 // For check plugin execId exist
 var pluginExecCache = expirable.NewLRU[int64, request.PluginInfo](1024, nil, time.Hour*24)
-var runningCache = expirable.NewLRU[int64, int](1024, nil, time.Hour*24)
+var runningCache = expirable.NewLRU[int64, *exec.Cmd](1024, nil, time.Hour*24)
 
 // var pluginCache = expirable.NewLRU[int64, request.PluginInfo](60, nil, time.Millisecond*10)
 
@@ -139,7 +140,7 @@ func SendPluginResult(c *gin.Context) {
 	// send result
 	switch pluginInfo.PlugResultType {
 	case PluginResultTypeText:
-		err = SendResult(pluginInfo, httpPluginResult.PlugResultText, 0, "")
+		err = SendResult(pluginInfo, httpPluginResult.PlugResultText, httpPluginResult.ExecResultId, "")
 		if err != nil {
 			log.Errorf("SendPluginResult", "SendResult error: %v", err)
 
@@ -147,12 +148,11 @@ func SendPluginResult(c *gin.Context) {
 				"code": -1,
 				"msg":  "pluginInfo send failed",
 			})
-
 			return
 		}
 	case PluginResultTypeFile:
 		// err = SendResult(pluginInfo, "", 0, "/home/asklv/Projects/kvm-agent/internal/runner/handlers/plugin_runner_handler.go")
-		err = SendResult(pluginInfo, "", 0, httpPluginResult.PlugResultFilePath)
+		err = SendResult(pluginInfo, "", httpPluginResult.ExecResultId, httpPluginResult.PlugResultFilePath)
 		if err != nil {
 			log.Errorf("SendPluginResult", "SendResult error: %v", err)
 
@@ -177,14 +177,14 @@ func SendPluginResult(c *gin.Context) {
 	})
 }
 
-func SendResult(info request.PluginInfo, result string, idx int, path string) error {
+func SendResult(info request.PluginInfo, result string, stateId int64, path string) error {
 	client := resty.New()
 
 	req := client.R().
 		// SetHeader("Content-Type", "application/json").
 		// SetHeader("Content-Type", "application/json").
 		SetMultipartField("stateCode", "", "", strings.NewReader(fmt.Sprintf("%d", 1))).
-		SetMultipartField("stateId", "", "", strings.NewReader(fmt.Sprintf("%d\n", info.ExecResultIdList[idx]))).
+		SetMultipartField("stateId", "", "", strings.NewReader(fmt.Sprintf("%d\n", stateId))).
 		SetMultipartField("stateResponse", "", "", strings.NewReader(result)).
 		SetMultipartField("otherMessage", "", "", strings.NewReader(""))
 		// SetMultipartFormData(map[string]string{
@@ -211,7 +211,7 @@ func SendResult(info request.PluginInfo, result string, idx int, path string) er
 	}
 
 	log.Debugf("SendResult", "resp: %+v", resp, fmt.Sprintf("%s", info.ResponseUrl))
-	fmt.Println("resp:", resp, info.ExecResultIdList[idx], fmt.Sprintf("%s", info.ResponseUrl))
+	fmt.Println("resp:", resp, stateId, fmt.Sprintf("%s", info.ResponseUrl))
 
 	return nil
 }
@@ -239,17 +239,26 @@ func StopPlugin(c *gin.Context) {
 			"code": -1,
 			"msg":  "runningPID not found",
 		})
-	}
-
-	// Run kill
-	kill := exec.Command("kill", "-9", fmt.Sprintf("%d", runningPID))
-	err = kill.Run()
-	if err != nil {
-		fmt.Println("kill.Run error:", err)
-		log.Errorf("StopPlugin", "kill.Run error: %v", err)
 
 		return
 	}
+
+	// Run kill
+	if err := runningPID.Process.Signal(syscall.SIGINT); err != nil {
+		fmt.Println("runningPID.Process.Signal error:", err)
+		log.Errorf("StopPlugin", "runningPID.Process.Signal error: %v", err)
+
+		return
+	}
+
+	// kill := exec.Command("kill", "-9", fmt.Sprintf("%d", runningPID))
+	// err = kill.Run()
+	// if err != nil {
+	// 	fmt.Println("kill.Run error:", err)
+	// 	log.Errorf("StopPlugin", "kill.Run error: %v", err)
+
+	// 	return
+	// }
 
 	// send http result
 	c.JSON(200, gin.H{
@@ -272,6 +281,16 @@ func RunPlugin(c *gin.Context) {
 		return
 	}
 
+	go runPlugin(pluginInfo)
+
+	// send http result
+	c.JSON(200, gin.H{
+		"code": 0,
+		"msg":  "success",
+	})
+}
+
+func runPlugin(pluginInfo request.PluginInfo) {
 	fmt.Printf("pluginInfo: %#v\n", pluginInfo)
 	log.Debugf("RunPlugin", "pluginInfo: %+v", pluginInfo)
 
@@ -295,7 +314,7 @@ func RunPlugin(c *gin.Context) {
 		Value string `json:"value"`
 	}
 	var paramList []Param
-	err = json.Unmarshal([]byte(pluginInfo.ExecParams), &paramList)
+	err := json.Unmarshal([]byte(pluginInfo.ExecParams), &paramList)
 	if err != nil {
 		fmt.Println("json.Unmarshal error:", err)
 		log.Errorf("RunPlugin", "json.Unmarshal error: %v", err)
@@ -375,7 +394,7 @@ func RunPlugin(c *gin.Context) {
 		// }
 
 		// Store running pid
-		runningCache.Add(pluginInfo.ExecResultIdList[i], cmd.Process.Pid)
+		runningCache.Add(pluginInfo.ExecResultIdList[i], cmd)
 
 		result := out.String()
 		fmt.Println("RunPlugin result:", result)
@@ -393,14 +412,14 @@ func RunPlugin(c *gin.Context) {
 		// send result
 		switch pluginInfo.PlugType {
 		case PluginTypeCommand:
-			err = SendResult(pluginInfo, result, i, "")
+			err = SendResult(pluginInfo, result, pluginInfo.ExecResultIdList[i], "")
 			if err != nil {
 				log.Errorf("RunPlugin", "SendResult error: %v", err)
 
 				return
 			}
 		case PluginTypeHTTP:
-			err = SendResult(pluginInfo, result, i, "")
+			err = SendResult(pluginInfo, result, pluginInfo.ExecResultIdList[i], "")
 			if err != nil {
 				log.Errorf("RunPlugin", "SendResult error: %v", err)
 

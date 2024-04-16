@@ -1,16 +1,20 @@
 package request
 
 type PluginInfo struct {
-	ExecCommand      string  `json:"execCommand"`
-	ExecNumber       int     `json:"execNumber"`
-	ResponseUrl      string  `json:"responseUrl"`
+	ExecCommand string `json:"execCommand"`
+	ExecNumber  int    `json:"execNumber"`
+	ResponseUrl string `json:"responseUrl"`
+
+	// stateIdList
 	ExecResultIdList []int64 `json:"execResultIdList"`
 	PlugType         int     `json:"plugType"`
 	PlugResultType   int     `json:"plugResultType"`
 	ExecParams       string  `json:"execParams"`
 	PlugId           int64   `json:"plugId"`
-	RecordId         int64   `json:"recordId"`
-	PlugPath         string  `json:"plugPath"`
+
+	// execRecordId
+	RecordId int64  `json:"recordId"`
+	PlugPath string `json:"plugPath"`
 }
 
 type HttpPluginParam struct {
